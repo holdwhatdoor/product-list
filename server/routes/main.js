@@ -1,5 +1,4 @@
 const router = require("express").Router();
-// const faker = require("faker");
 // const { faker } = require("@faker-js/faker")
 const Product = require("../models/product");
 const Review = require("../models/review");
@@ -26,9 +25,17 @@ router.param("product", function(req, res, next){
   next();
 })
 // get route for all Products
-router.get("/products", (req, res, next) => {
-  let productsQuery = Product.find({}).exec();
-  productsQuery.then((products) => {
+router.get("/products", async (req, res, next) => {
+  // items per page and page variables
+  const perPage = 9;
+  const page = req.query.page || 1;
+  Product.find({})
+  .skip(perPage * page - perPage)
+  .limit(perPage)
+  .exec()
+  .then((products) => {
+    const totalPages = Object.keys(products).length;
+    console.log(totalPages)
     res.send(products);
   })
 })
@@ -48,20 +55,32 @@ router.get("/products/:product/reviews", (req, res, next) => {
 })
 // post route for creating a new product to products page
 router.post("/products", (req, res, next) => {
-  let product = req.body;
-  res.send(req.body)
+  let product = req.body.newProduct;
+  if(!product.category || !product.name || !product.price || !product.image){
+    res.writeHead(400, "Invalid product input");
+    return res.end();
+  }
+  console.log("post product")
+  console.log(product)
+  res.post(req.body.newProduct)
+  
 })
 // post route for creating a new review in the database for the correct product's reviews array 
 router.post("/products/:product/reviews", (req, res, next) => {
-
+  let review = req.body.newReview;
+  console.log(review)
+  res.post(req.body.newReview)
+  
 })
 // deletes product by param product's id
 router.delete("/products/:product", (req, res, next) => {
-
+  Product.findByIdAndDelete(req.params.product)
+  res.delete(req.params.product)
 })
 // deletes review by param review's id
 router.delete("/reviews/:review", (res, req, next) => {
-
+  Review.findByIdAndDelete(req.params.review)
+  res.delete(req.params.review)
 })
 
 module.exports = router;

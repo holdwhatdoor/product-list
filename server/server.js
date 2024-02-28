@@ -16,7 +16,7 @@ app.use(
   })
 );
 
-const mainRoutes = require("./routes/main");
+const mainRoutes = require("../routes/main");
 
 app.use(mainRoutes);
 
