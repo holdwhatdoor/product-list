@@ -11,7 +11,7 @@ export const FETCH_REVIEW = "FETCH_PRODUCT";
 export const DELETE_REVIEW = "DELETE_PRODUCT";
 export const CREATE_REVIEW = "CREATE_PRODUCT";
 
-const ROOT_URL = "localhost:8001/";
+const ROOT_URL = "localhost:8001";
 
 export function fetchProducts(){
   const request = axios.get(`${ROOT_URL}/products`);

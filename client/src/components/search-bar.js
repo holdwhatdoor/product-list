@@ -10,10 +10,8 @@ const searchBar = () => {
   const categories = [];
 
   const [ searchInput, setSearch ] = useState('')
-  const searchFormValid = Boolean(searchInput);
-
-  const [ categorySelected, selectCategory ] = useState()
-  // const [ ]
+  const [ categorySelected, setCategory ] = useState()
+  const [ priceSorted, setPriceSort ] = useState();
 
   const populateCategoryPicker = (categoriesArray) => {
     const [ selectedCategory, setCategory] = useState()
