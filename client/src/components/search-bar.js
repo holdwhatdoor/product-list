@@ -1,8 +1,10 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { fetchCategory } from '../reducers/productsSlice';
+import { filterCategory } from '../reducers/productsSlice';
 import { sortPrice } from '../reducers/productsSlice';
+import React, { useState } from 'react';
+import { useSelector, useStore } from 'react-redux';
 
-const searchBar = () => {
+const SearchBar = () => {
   // store variable declaration and variable to track state of store
   const store = useStore();
   const products = useSelector((state) => state);
@@ -13,7 +15,7 @@ const searchBar = () => {
   const [ categorySelected, setCategory ] = useState()
   const [ priceSorted, setPriceSort ] = useState();
 
-  const populateCategoryPicker = (categoriesArray) => {
+  const PopulateCategoryPicker = (categoriesArray) => {
     const [ selectedCategory, setCategory] = useState()
   }
 
@@ -23,12 +25,11 @@ const searchBar = () => {
         <header className="search-bar">
           <form className="search-form">
             <div className="form-group form-group col-md-4">
-              <h1>Search: </h1>
               <input 
                 type="text" 
                 id="search-query"
                 className="form-control col-md-4"
-                placeholder="enter search input"
+                placeholder="Search"
                 onChange={(event) => setSearch(event.target.value)}
               />
               <select
@@ -36,7 +37,7 @@ const searchBar = () => {
                 id="selectCategory"
                 className='form-control col-md-1'
                 onSelect={(event) => setCategory(event.target.value)}
-                // defaultValue={}  
+                defaultValue={ "Sort By Category" }  
                 multiple={false}
               >
                 <option value=""></option>
@@ -46,7 +47,7 @@ const searchBar = () => {
                 id="sortPrice"
                 className='form-control col-md-1'
                 onSelect={(event) => setPriceSort(event.target.value)}
-                // defaultValue={}  
+                defaultValue={ "Sort By Price" }  
                 multiple={false}
               >
                 <option value="Low to High"></option>
@@ -60,4 +61,4 @@ const searchBar = () => {
   );
 };
 
-export default searchBar;
+export default SearchBar;

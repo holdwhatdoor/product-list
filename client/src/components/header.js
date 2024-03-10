@@ -1,5 +1,6 @@
+import React from "react";
 // header DOM component
-const header = (props) => (
+const Header = (props) => (
   <div>
     <div className="jumbotron text-center">
       <div className="container">
@@ -10,4 +11,4 @@ const header = (props) => (
   </div>
 );
 
-export default header;
+export default Header;

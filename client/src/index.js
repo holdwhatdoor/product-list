@@ -12,19 +12,25 @@ import Header from './components/header';
 import SearchBar from './components/search-bar';
 import ProductsIndex from './components/products-index';
 import reportWebVitals from './reportWebVitals';
+import ProductCardIndex from './components/product-card-index';
 
-// const root = ReactDOM.createRoot(document.getElementById('root'));
-ReactDOM.render(
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
   <Provider store={store}>
     <BrowserRouter>
       <Header />
       <SearchBar />
       <Routes>
-        <Route path="/" Component={ ProductsIndex } />
+        {/* <Route path="/" Component={ ProductsIndex } /> */}
+        <Route path="/products" Component={ ProductsIndex }/>
+        <Route path="/products/:product" Component={ ProductCardIndex }/>
+        <Route path="/products/:product/reviews" Component={ ProductsIndex }/>
+        <Route path="/reviews/:review" Component={ ProductsIndex }/>
       </Routes>
     </BrowserRouter>
-  </Provider>,
-  document.getElementById('root')
+  </Provider>
+  // ,
+  // document.getElementById('root')
 );
 
 // If you want to start measuring performance in your app, pass a function

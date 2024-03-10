@@ -10,10 +10,10 @@ const initialState = {
   error: null,
 };
 
-export const fetchCategory = createAsyncThunk('reducers/fetchCategories', 
+export const filterCategory = createAsyncThunk('reducers/fetchCategories', 
   async (categories, thunkApi) => {
     try{
-      const response = await axios.get("localhost:8001/products")
+      const response = await axios.get("localhost:3000/products")
       return response;
     } catch (err) {
       if (!err?.response) {
@@ -40,8 +40,8 @@ export const fetchProducts = createAsyncThunk('reducers/fetchProducts',
     try{
 
       const response = await axios.get(
-        "localhost:8001/products"
-        // "localhost:8001/products?page=1&category=tools&price=lowest&query=sleek frozen shoes"
+        "localhost:3000/products"
+        // "localhost:8000/products?page=1&category=tools&price=lowest&query=sleek frozen shoes"
       )
       return response;
     } catch (err) {
@@ -51,6 +51,30 @@ export const fetchProducts = createAsyncThunk('reducers/fetchProducts',
       return thunkApi.rejectWithValue({ err: 'Error with query' });
     }
   }) 
+
+  export const fetchProduct = createAsyncThunk('reducers/fetchProducts',
+    async (product, thunkApi) => {
+      try {
+
+      } catch (err) {
+        if (!err?.response) {
+          throw err;
+        }
+        return thunkApi.rejectWithValue({ err: 'Error with query' });
+      }
+    })
+
+  export const searchQuery = createAsyncThunk('reducers/fetchProducts', 
+    async (thunkApi) => {
+      try {
+
+      } catch(err) {
+        if (!err?.response) {
+          throw err;
+        }
+        return thunkApi.rejectWithValue({ err: 'Error with query' });
+      }
+    })
 
 const productsSlice = createSlice({
   name: 'products',
@@ -69,3 +93,5 @@ const productsSlice = createSlice({
       })
   }
 });
+
+export default productsSlice.reducer;
