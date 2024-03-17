@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 
 
-mongoose.connect("mongodb://localhost/products", {
+mongoose.connect("mongodb://localhost", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -33,9 +33,9 @@ app.use(mainRoutes);
 
 let port = process.env.PORT;
 if(port == null || port == ""){
-  port == 3000;
+  port == 8000;
 }
 
 app.listen(port, () => {
-  console.log("Node.js listening on port " + 3000);
+  console.log("Node.js listening on port " + 8000);
 });

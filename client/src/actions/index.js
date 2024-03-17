@@ -1,5 +1,6 @@
 import axios from "axios";
-import { fetchProducts } from "../reducers/productsSlice";
+import { FetchProducts } from "../reducers/productsSlice";
+import { FetchProdcut } from '../reducers/productsSlice';
 
 export const FETCH_PRODUCTS = "FETCH_PRODUCTS";
 export const FETCH_PRODUCT = "FETCH_PRODUCT";
@@ -37,7 +38,7 @@ export function deleteProduct(id, callback){
   request.then(() => callback());
 
   return {
-    type: DELETE_POST,
+    type: DELETE_PRODUCT,
     payload: request
   }
 }

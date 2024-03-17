@@ -20,38 +20,46 @@ const SearchBar = () => {
   }
 
   return (
-    <div>
-      <div className="container">
+    <div style={{backgroundColor: 'lightgrey'}}>
+      <div className="container" style={{}}>
         <header className="search-bar">
-          <form className="search-form">
-            <div className="form-group form-group col-md-4">
+          <form className="search-form form-group row">
+            <div className='col-md-8'>
               <input 
                 type="text" 
                 id="search-query"
-                className="form-control col-md-4"
+                className="form-control "
                 placeholder="Search"
                 onChange={(event) => setSearch(event.target.value)}
               />
+            </div>
+            <div className='col-md-2'>
               <select
                 name="selectedCategory"
                 id="selectCategory"
-                className='form-control col-md-1'
+                className='form-control minimal'
                 onSelect={(event) => setCategory(event.target.value)}
-                defaultValue={ "Sort By Category" }  
+                placeholder={"Sort By Category"}
+                defaultValue= {"Sort By Category"}   
                 multiple={false}
               >
+                <option>Category</option>
+                <option value=""></option>
                 <option value=""></option>
               </select>
+            </div>
+            <div className='col-md-2'>
               <select
                 name="sortPrice"
                 id="sortPrice"
-                className='form-control col-md-1'
+                className='form-control'
                 onSelect={(event) => setPriceSort(event.target.value)}
                 defaultValue={ "Sort By Price" }  
                 multiple={false}
               >
-                <option value="Low to High"></option>
-                <option value="High to Low"></option>
+                <option >Sort Price</option>
+                <option value="Low to High">Low to High</option>
+                <option value="High to Low">High to Low</option>
               </select>
             </div>
           </form>

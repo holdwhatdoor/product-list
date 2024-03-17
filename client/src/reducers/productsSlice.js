@@ -12,69 +12,69 @@ const initialState = {
 
 export const filterCategory = createAsyncThunk('reducers/fetchCategories', 
   async (categories, thunkApi) => {
-    try{
-      const response = await axios.get("localhost:3000/products")
-      return response;
-    } catch (err) {
-      if (!err?.response) {
-        throw err;
-      }
-      return thunkApi.rejectWithValue({ err: 'Error with category filter' });
+  try{
+    const response = await axios.get("localhost:8000/products")
+    return response;
+  } catch (err) {
+    if (!err?.response) {
+      throw err;
     }
-  })
+    return thunkApi.rejectWithValue({ err: 'Error with category filter' });
+  }
+})
 
 export const sortPrice = createAsyncThunk('reducers/sortPrice', 
   async(sort, thunkApi) => {
-    try{
+  try{
 
-    } catch (err) {
-      if(!err?.response) {
-        throw err;
-      }
-      return thunkApi.rejectWithValue({ err: 'Error with price sort'});
+  } catch (err) {
+    if(!err?.response) {
+      throw err;
     }
-  })
+    return thunkApi.rejectWithValue({ err: 'Error with price sort'});
+  }
+})
 
 export const fetchProducts = createAsyncThunk('reducers/fetchProducts', 
   async (products, thunkApi) => {
-    try{
+  try{
 
-      const response = await axios.get(
-        "localhost:3000/products"
-        // "localhost:8000/products?page=1&category=tools&price=lowest&query=sleek frozen shoes"
-      )
-      return response;
-    } catch (err) {
-      if (!err?.response) {
-        throw err;
-      }
-      return thunkApi.rejectWithValue({ err: 'Error with query' });
+    const response = await axios.get(
+      "localhost:8000/products"
+      // "localhost:8000/products?page=1&category=tools&price=lowest&query=sleek frozen shoes"
+    )
+    return response;
+  } catch (err) {
+    if (!err?.response) {
+      throw err;
     }
-  }) 
+    return thunkApi.rejectWithValue({ err: 'Error with query' });
+  }
+}) 
 
-  export const fetchProduct = createAsyncThunk('reducers/fetchProducts',
-    async (product, thunkApi) => {
-      try {
+export const fetchProduct = createAsyncThunk('reducers/fetchProducts',
+  async (product, thunkApi) => {
+  try {
 
-      } catch (err) {
-        if (!err?.response) {
-          throw err;
-        }
-        return thunkApi.rejectWithValue({ err: 'Error with query' });
-      }
-    })
+  } catch (err) {
+    if (!err?.response) {
+      throw err;
+    }
+    return thunkApi.rejectWithValue({ err: 'Error with query' });
+  }
+})
 
-  export const searchQuery = createAsyncThunk('reducers/fetchProducts', 
-    async (thunkApi) => {
-      try {
+export const searchQuery = createAsyncThunk('reducers/fetchProducts', 
+  async (thunkApi) => {
+  try {
 
-      } catch(err) {
-        if (!err?.response) {
-          throw err;
-        }
-        return thunkApi.rejectWithValue({ err: 'Error with query' });
-      }
-    })
+  } catch(err) {
+    if (!err?.response) {
+      throw err;
+    }
+    return thunkApi.rejectWithValue({ err: 'Error with query' });
+  }
+})
 
 const productsSlice = createSlice({
   name: 'products',
@@ -85,7 +85,7 @@ const productsSlice = createSlice({
         state.loading = true;
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
-
+        
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.loading = false;

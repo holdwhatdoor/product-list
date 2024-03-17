@@ -50,16 +50,65 @@ router.param("review", function(req, res, next){
   next();
 })
 
+// router.get(`/`, async (req, res, next) => {
+//   //ex route 1 /products?page=1&category=tools&price=lowest&query=sleek frozen shoes
+//   // example route 2 - /products?page=1&category=tools&price=highest
+
+//   const categoriesArray = [];
+//   // items per page and page variables
+//   const perPage = 9;
+//   const page = req.query.page || 1;
+//   let priceSort = "asc";
+
+//   const selectedCategory = '';
+
+//   if(req.query.price === "highest"){
+//     priceSort = 'desc'
+//   } else {
+//     priceSort = 'asc'
+//   }
+
+//   if(req.query.category != undefined){
+//     Product.find({})
+//     .where("category")
+//     .equals(upperCaseFirstLetter(req.query.category))
+//     .where()
+//     .sort({ price: priceSort })
+//     .skip(perPage * page - perPage)
+//     .limit(perPage)
+//     .exec()
+//     .then((products) => {
+//       console.log("products")
+//       console.log(products)
+//       res.send(products);
+//     })
+//   } else {
+//     Product.find({})
+//     .sort({ price: priceSort })
+//     .skip(perPage * page - perPage)
+//     .limit(perPage)
+//     .exec()
+//     .then((products) => {
+//       res.send(products);
+//     })
+//   }
+
+// })
+
 // get route for all Products
 router.get(`/products`, async (req, res, next) => {
   //ex route 1 /products?page=1&category=tools&price=lowest&query=sleek frozen shoes
   // example route 2 - /products?page=1&category=tools&price=highest
 
-  const categoriesArray = [];
+  const categoriesArray = populateProductCategories();
+  console.log("categories: ")
+  console.log(categoriesArray)
   // items per page and page variables
   const perPage = 9;
   const page = req.query.page || 1;
   let priceSort = "asc";
+
+  const selectedCategory = '';
 
   if(req.query.price === "highest"){
     priceSort = 'desc'
@@ -77,6 +126,8 @@ router.get(`/products`, async (req, res, next) => {
     .limit(perPage)
     .exec()
     .then((products) => {
+      console.log("products")
+      console.log(products)
       res.send(products);
     })
   } else {
