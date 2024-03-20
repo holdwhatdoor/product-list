@@ -1,4 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { fetchProducts } from '../reducers/productsSlice';
 import { filterCategory } from '../reducers/productsSlice';
 import { sortPrice } from '../reducers/productsSlice';
 import React, { useState } from 'react';
@@ -7,16 +8,25 @@ import { useSelector, useStore } from 'react-redux';
 const SearchBar = () => {
   // store variable declaration and variable to track state of store
   const store = useStore();
-  const products = useSelector((state) => state);
+  // const products = useSelector((state) => state);
 
   const categories = [];
 
   const [ searchInput, setSearch ] = useState('')
-  const [ categorySelected, setCategory ] = useState()
-  const [ priceSorted, setPriceSort ] = useState();
+  const [ categorySelected, setCategory ] = useState('')
+  const [ priceSorted, setPriceSort ] = useState('');
+
+  const onSearchInputChange = () => {
+    store.dispatch(fetchProducts)
+  }
+
+  const onCategorySelect = () => {
+
+  }
 
   const PopulateCategoryPicker = (categoriesArray) => {
-    const [ selectedCategory, setCategory] = useState()
+    const [ selectedCategory, setCategory] = useState('')
+
   }
 
   return (

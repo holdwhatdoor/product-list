@@ -8,15 +8,20 @@ import SearchBar from './search-bar';
 
 const ProductsIndex = () => {
   const store = useStore();
-  const products = useSelector((state) => state)
+  // const products = useSelector((state) => state)
+
+  const productGridRow = (products) => {
+    let gridArray = [];
+
+  }
 
   return (
     // <div className="main-products-page">
       <div className="product-page-container" style={{ backgroundColor: 'lightgrey', position: 'absolute', height: "100%", width: "100%"}}>
         <Header />
         <SearchBar />
-        <div className="product-page grid row" style={{ alignItems: 'center', height: "100%"}} >
-          <div className="col" style={{ alignItems: "end" }}>
+        <div className="product-page grid row" style={{ alignContent: "flex-start", height: "100%"}} >
+          <div className="col" style={{ }}>
             <ProductCardIndex />
           </div>
           <div className="col">
@@ -25,16 +30,6 @@ const ProductsIndex = () => {
           <div className="col">
             <ProductCardIndex />
           </div>
-          <div className="col">
-            <ProductCardIndex />
-          </div>
-          <div className="col">
-            <ProductCardIndex />
-          </div>
-          <div className="col">
-            <ProductCardIndex />
-          </div>
-
         </div>
       </div>  
   );

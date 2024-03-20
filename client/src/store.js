@@ -11,7 +11,7 @@ import productsSlice from './reducers/productsSlice';
 export const store = configureStore({
   reducer: { products: productsSlice },
   initialState: [
-    { searchInput: "", productsData: { _id: "", reviews: [], category: "", 
+    { searchInput: "", categories: "", pages: [], currentPage: "", productsData: { _id: "", reviews: [], categories: [], selectedCategory: "", 
     name: "", price: 0, image: "" } }
   ],
   middleware: (getDefaultMiddleware) => getDefaultMiddleware({

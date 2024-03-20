@@ -12,7 +12,10 @@ export const FETCH_REVIEW = "FETCH_PRODUCT";
 export const DELETE_REVIEW = "DELETE_PRODUCT";
 export const CREATE_REVIEW = "CREATE_PRODUCT";
 
-const ROOT_URL = "localhost:3000";
+export const FETCH_CATEGORIES = "FETCH_CATEGORIES";
+export const FETCH_SORT = "FETCH_SORT";
+
+const ROOT_URL = "localhost:8000";
 
 export function fetchProducts(){
   const request = axios.get(`${ROOT_URL}/products`);

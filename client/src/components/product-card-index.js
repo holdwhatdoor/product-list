@@ -4,7 +4,7 @@ import { useSelector, useStore } from 'react-redux';
 
 const ProductCardIndex = () => {
   const store = useStore();
-  const product = useSelector((state) => state);
+  // const product = useSelector((state) => state);
 
   return (
     <div className="card-container" style={{width: '95%', height: '90%', padding: '5%' }}>
@@ -20,8 +20,8 @@ const ProductCardIndex = () => {
         </label>        
       </div>
       <div className='card-body media' style={{padding:'1% 5% 1% 5%', backgroundColor: 'white', display: 'block'}}>
-        <div className="image-container" style={{ backgroundColor: "grey", height: "100%", verticalAlign: 'middle', textAlign: 'center' }}>
-          <img className='card-body' src='' id="product" alt="Product Image" />
+        <div className="image-container" style={{ backgroundColor: "grey", height: "100%", width: "100%", verticalAlign: 'middle', textAlign: 'center', blockSize: "140px"}}>
+          <img className='card-body' src='' id="product" alt="Product Display" style={{ height: "100%", width: "100%" }} />
         </div>
       </div>  
       <div className='card-footer' id="product-name" style={{ padding: '5%', backgroundColor: 'white'}}>

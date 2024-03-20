@@ -15,12 +15,14 @@ import ProductCardIndex from './components/product-card-index';
 import ProductReviews from './components/product-reviews';
 import Review from './components/review'
 import reportWebVitals from './reportWebVitals';
+import HomeNavButton from './components/home-nav-button';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <Provider store={store}>
     <BrowserRouter>
       <Routes>
+        <Route path="/" Component={ HomeNavButton }/>
         <Route path="/products" Component={ ProductsIndex }/>
         <Route path="/products/:product" Component={ ProductCardIndex }/>
         <Route path="/products/:product/reviews" Component={ ProductReviews }/>

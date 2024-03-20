@@ -2,7 +2,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-// initialState variable
+// initialState products variable
 const initialState = {
   products: [],
   categories: [],
@@ -13,7 +13,7 @@ const initialState = {
 export const filterCategory = createAsyncThunk('reducers/fetchCategories', 
   async (categories, thunkApi) => {
   try{
-    const response = await axios.get("localhost:8000/products")
+    const response = await axios.get("localhost:000/products")
     return response;
   } catch (err) {
     if (!err?.response) {
@@ -36,20 +36,19 @@ export const sortPrice = createAsyncThunk('reducers/sortPrice',
 })
 
 export const fetchProducts = createAsyncThunk('reducers/fetchProducts', 
-  async (products, thunkApi) => {
-  try{
-
-    const response = await axios.get(
-      "localhost:8000/products"
-      // "localhost:8000/products?page=1&category=tools&price=lowest&query=sleek frozen shoes"
-    )
-    return response;
-  } catch (err) {
-    if (!err?.response) {
-      throw err;
+  async (category, productQuery, thunkApi) => {
+    try{
+      const response = await axios.get(
+        "localhost:8000/products"
+        // "localhost:8000/products?page=1&category=tools&price=lowest&query=sleek frozen shoes"
+      )
+      return response;
+    } catch (err) {
+      if (!err?.response) {
+        throw err;
+      }
+      return thunkApi.rejectWithValue({ err: 'Error with query' });
     }
-    return thunkApi.rejectWithValue({ err: 'Error with query' });
-  }
 }) 
 
 export const fetchProduct = createAsyncThunk('reducers/fetchProducts',
