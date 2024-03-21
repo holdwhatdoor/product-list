@@ -31,14 +31,28 @@ const upperCaseFirstLetter = (string) => {
 
 function populateProductCategories(){
   // let productsArray;
-  let categoryArray = Product.find({}).exec().then((products) => {
-    // products.reduce((acc, index) => {
-    //   acc.push(index);
-    //   return acc;
-    // }, [])
-    console.log(products)
-    return categoryArray;
+  let categoryArray = []; 
+  Product.find({}).exec().then((products) => {
+    products.reduce((acc, index) => {
+      acc.push(index);
+      return acc;
+    }, [])
   })
+  return categoryArray;
+}
+
+const productIdFromNameQuery = (productNameQuery) => {
+  let id = productNameQuery.substring(1, productNameQuery.length);
+  let productFromId = {};
+  Product.find({})
+    .where("_id")
+    .equals(id)
+    .exec()
+    .then((productId) => {
+      productFromId = 
+      res.send(productId)
+    })
+    return productFromId;
 }
 
 // router params
@@ -71,8 +85,7 @@ router.get(`/products`, async (req, res, next) => {
   } else {
     priceSort = 'asc'
   }
-  console.log("req: ")
-  console.log(req);
+  
   if(req.query.category != undefined){
     Product.find({})
     .where("category")
@@ -83,8 +96,6 @@ router.get(`/products`, async (req, res, next) => {
     .limit(perPage)
     .exec()
     .then((products) => {
-      console.log("products")
-      console.log(products)
       res.send(products);
     })
   } else {
@@ -94,8 +105,6 @@ router.get(`/products`, async (req, res, next) => {
     .limit(perPage)
     .exec()
     .then((products) => {
-      console.log("products: ")
-      console.log(products)
       res.send(products);
     })
   }
@@ -103,7 +112,9 @@ router.get(`/products`, async (req, res, next) => {
 })
 // get route for specific product in products
 router.get("/products/:product", (req, res, next) => {
-  let product = Product.find({_id: req.params.product}).exec();
+  let productId = req.params.product.substring(1, req.params.product.length);
+  let product = Product.find({ _id: productId  })
+  .exec();
   product.then((product) => {
     res.send(product);
   })
