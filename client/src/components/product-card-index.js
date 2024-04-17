@@ -2,9 +2,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState } from 'react';
 import { useSelector, useStore } from 'react-redux';
 
-const ProductCardIndex = () => {
+const ProductCardIndex = (props) => {
   const store = useStore();
-  // const product = useSelector((state) => state);
 
   return (
     <div className="card-container" style={{width: '95%', height: '90%', padding: '5%' }}>

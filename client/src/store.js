@@ -1,17 +1,20 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import productsSlice from './reducers/productsSlice';
+import categorySlice from './reducers/categorySlice';
+import paginationSlice from './reducers/paginationSlice';
 
-// default middleware with serializableCheck set to false
-// const nonSerializedMiddleware = (getDefaultMiddleware) => getDefaultMiddleware({
-//   serializableCheck: false,
-// });
+const reducers = combineReducers({
+  products: productsSlice,
+  categories: categorySlice, 
+  pagination: paginationSlice 
+})
 
 // configured Store variable to handle state of store for App
 export const store = configureStore({
-  reducer: { products: productsSlice },
+  reducer: reducers,
   initialState: [
-    { searchInput: "", categories: "", pages: [], currentPage: "", productsData: { _id: "", reviews: [], categories: [], selectedCategory: "", 
+    { searchInput: "", categories: [], pages: [], selectedCategory: "", currentPage: 1, products: [], selectedProduct: "", productData: { _id: "", reviews: [], 
     name: "", price: 0, image: "" } }
   ],
   middleware: (getDefaultMiddleware) => getDefaultMiddleware({

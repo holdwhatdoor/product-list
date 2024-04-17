@@ -6,15 +6,15 @@ import axios from 'axios';
 
 // initialState categories variable
 const initialState = {
-  categories: [],
+  categories: [], 
   selectedCategory: '',
-  status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
-  error: null,
+  // status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
+  // error: null,
 };
 
 export const fetchCategories = createAsyncThunk('reducers/fetchCategories', async (thunkApi) => {
   try{
-    const response = await axios.get("localhost:8000/products")
+    const response = await axios.get("http://localhost:8000/products")
     return response;
   } catch (err) {
     if (!err?.response) {
@@ -25,9 +25,9 @@ export const fetchCategories = createAsyncThunk('reducers/fetchCategories', asyn
 })
 
 export const filterCategory = createAsyncThunk('reducers/filterCategories', 
-  async (categories, thunkApi) => {
+  async (selectedCategory, thunkApi) => {
   try{
-    const response = await axios.get("localhost:8000/products")
+    const response = await axios.get(`http://localhost:8000/products?category=${selectedCategory}`)
     return response;
   } catch (err) {
     if (!err?.response) {
@@ -36,3 +36,30 @@ export const filterCategory = createAsyncThunk('reducers/filterCategories',
     return thunkApi.rejectWithValue({ err: 'Error with category filter' });
   }
 })
+
+const categorySlice = createSlice({
+  name: "categories",
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchCategories.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchCategories.fulfilled, (state, action) => {
+        state.categories = action.payload.data.categories;
+        state.selectedCategory = action.payload.data.category;
+        state.datareturned = action.payload.data;
+
+        state.succeeded = true;
+        state.error = undefined;
+      })
+      .addCase(fetchCategories.rejected, (state, action) => {
+        state.categories = undefined;
+        state.failed = true;
+        state.error = action?.payload;
+      })
+  }
+})
+
+export default categorySlice.reducer;

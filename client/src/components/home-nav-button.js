@@ -6,7 +6,7 @@ const HomeNavButton = () => {
 
   let navigate = useNavigate();
   const changeRoute = () => {
-    let homePage = '/products';
+    let homePage = '/products?page=1&price=highest';
     navigate(homePage);
   }
 
