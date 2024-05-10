@@ -1,4 +1,3 @@
-import React from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -6,8 +5,8 @@ const HomeNavButton = () => {
 
   let navigate = useNavigate();
   const changeRoute = () => {
-    let homePage = '/products?page=1&price=highest';
-    navigate(homePage);
+    const homePageUrl = 'products?page=1&price=desc';
+    navigate(homePageUrl);
   }
 
   return (

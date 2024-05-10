@@ -32,12 +32,9 @@ const mainRoutes = require("./routes/main");
 app.use(mainRoutes);
 
 const PORT = process.env.PORT || 8000;
-console.log("port")
-console.log(PORT)
 if(PORT == undefined || PORT == ""){
   PORT == 8000;
 }
 
 app.listen(PORT, () => {
-  console.log("Node.js listening on port " + PORT);
 });

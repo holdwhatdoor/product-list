@@ -1,10 +1,12 @@
 const router = require("express").Router();
 const product = require("../models/product");
-// const { faker } = require("@faker-js/faker")
 const Product = require("../models/product");
 const Review = require("../models/review");
 
-// code to generate random fake data
+/**
+ *  function to initially populate database with 90 random products 
+ */
+// const { faker } = require("@faker-js/faker")
 // router.get("/generate-fake-data", (req, res, next) => {
 //   for (let i = 0; i < 90; i++) {
 //     let product = new Product();
@@ -37,6 +39,7 @@ const upperCaseFirstLetter = (string) => {
 // determines total number of browser pages for given set of products data returned from the database query
 function getTotalPages(products){
   let totalPages = 0;
+ 
   if(products.length != 0){
     if((products.length % 9) > 0){
       totalPages = Math.floor((products.length/9) + 1);
@@ -56,7 +59,7 @@ function clearProducts() {
 // populates global products array with data returned from database
 async function populateProductsReturned(category, sortedPrice, searchQuery){
   switch(true){
-    case category != undefined:
+    case ((category != undefined) && (searchQuery === undefined)):
       await Product.find({})
       .where("category")
       .equals(upperCaseFirstLetter(category))
@@ -66,7 +69,7 @@ async function populateProductsReturned(category, sortedPrice, searchQuery){
         products.push(product);
       })
     break;
-    case sortedPrice != undefined && category === undefined && searchQuery === undefined:
+    case ((category === undefined) && (searchQuery === undefined) && (sortedPrice != undefined)):
       await Product.find({})
       .sort({ price: sortedPrice })
       .exec()
@@ -75,7 +78,7 @@ async function populateProductsReturned(category, sortedPrice, searchQuery){
         products.push(product);
       })
     break;
-    case category != undefined && sortedPrice != undefined && searchQuery === undefined:
+    case ((category != undefined) && (sortedPrice != undefined) && (searchQuery === undefined)):
       await Product.find({})
       .where("category")
       .equals(upperCaseFirstLetter(category))
@@ -86,7 +89,7 @@ async function populateProductsReturned(category, sortedPrice, searchQuery){
         products.push(product);
       })
     break;
-    case searchQuery != undefined:
+    case ((category === undefined) && (searchQuery != undefined)):
       let searchQueryRegEx = new RegExp(searchQuery, 'i');
       await Product.find({})
       .where("name")
@@ -97,6 +100,20 @@ async function populateProductsReturned(category, sortedPrice, searchQuery){
         products.push(product)
       })
       break;
+      case ((category != undefined) && (searchQuery != undefined)):
+        let searchQueryRegEx2 = new RegExp(searchQuery, 'i');
+        await Product.find({})
+        .where("name")
+        .regex(searchQueryRegEx2)
+        .where("category")
+        .equals(upperCaseFirstLetter(category))
+        .sort({ price: sortedPrice })
+        .exec()
+        .then((product) => {
+          clearProducts();
+          products.push(product);
+        })
+        break;
     default:
       await Product.find({})
       .exec()
@@ -119,19 +136,6 @@ async function populateProductCategories(){
   })
   productCategories.sort();
   return productCategories;
-}
-
-/** functions for processing returned data from database */ 
-// retrieves the price sort selection from user input
-function getPriceSortToggle(sortToggle){
-  switch (true){
-    case (sortToggle === "highest"):
-      return "desc";
-    case (sortToggle === "lowest"):
-      return "asc";
-    default:
-      return "desc";
-  }
 }
 
 // gets product id from product name
@@ -161,25 +165,21 @@ router.param("review", function(req, res, next){
 
 // get route for all Products
 router.get('/products', async (req, res, next) => {
-  //ex route 1 /products?page=1&category=tools&price=lowest&query=sleek frozen shoes
-  // example route 2 - /products?page=1&category=tools&price=highest
   try{
     // populate products and productCategories arrays with database data
-    await populateProductsReturned(req.query.category, getPriceSortToggle(req.query.price), req.query.query);
+    await populateProductsReturned(req.query.category, req.query.price, req.query.query);
     await populateProductCategories();
 
     // req.query result variables
-    const currentPage = req.query.page || 1;
-    const priceSort = getPriceSortToggle(req.query.price);
+    const currentPage = Number(req.query.page) || 1;
+    const priceSort = req.query.price;
     const selectedCategory = req.query.category;
     const querySearch = req.query.query;
-    let totalPages = 0;
-    console.log()
+    let totalPages = getTotalPages(products[0]);
+
     // switch case for optional parameters
     switch(true){
-      case ((selectedCategory != undefined) && (querySearch != undefined)):
-        console.log("selectedCat & querySearch != undefined")
-        console.log(req.query)
+      case ((selectedCategory != undefined ) && (querySearch != undefined)):
         totalPages = getTotalPages(products[0])
         let queryRegexCase1 = new RegExp(querySearch, 'i');
         await Product.find({})
@@ -199,13 +199,12 @@ router.get('/products', async (req, res, next) => {
             category: selectedCategory,
             query: querySearch,
             totalPages: totalPages,
+            priceSort: priceSort,
           };
           res.send(data);
         })
       break;
-      case ((selectedCategory != undefined)):
-        console.log("selectedCategory != undefined")
-        console.log(req.query)
+      case ((selectedCategory != undefined || "Categories")):
         totalPages = getTotalPages(products[0])
         await Product.find({})
         .where("category")
@@ -221,13 +220,12 @@ router.get('/products', async (req, res, next) => {
             currentPage: currentPage,
             category: selectedCategory,
             totalPages: totalPages,
+            priceSort: priceSort,
           };
           res.send(data);
         })
       break;
       case (querySearch != undefined):
-        console.log("querySearch != undefined")
-        console.log(req.query)
         totalPages = getTotalPages(products[0]);
         let queryRegexCase3 = new RegExp(querySearch, 'i');
         await Product.find({})
@@ -244,13 +242,13 @@ router.get('/products', async (req, res, next) => {
             currentPage: currentPage,
             query: querySearch,
             totalPages: totalPages,
+            priceSort: priceSort,
+            category: selectedCategory
           };
           res.send(data);
         })
       break;
       default:
-        console.log("default case")
-        console.log(req.query)
         totalPages = getTotalPages(products[0]);
         await Product.find({})
         .sort({ price: priceSort })
@@ -264,6 +262,7 @@ router.get('/products', async (req, res, next) => {
             currentPage: currentPage,
             totalPages: totalPages,
             category: selectedCategory,
+            priceSort: priceSort,
           };
           res.send(data);
         })

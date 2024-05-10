@@ -2,25 +2,24 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-// initialState page variable
+// initialState for pagination slice
 const initialState = {
-  pagination: {
-    totalPages: 1,
-    currentPage: 1,
-  },
-  // status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
-  // error: null,
+  totalPages: 1,
+  currentPage: 1,
 };
 
-export const fetchPagination = createAsyncThunk('reducers/fetchPages', async (thunkApi) => {
+const baseUrl = 'http://localhost:8000/products';
+
+export const fetchPagination = createAsyncThunk('reducers/fetchPagination', async (url, thunkApi) => {
   try{
-    let response = await axios.get("http://localhost:8000/products"); 
+    let response = undefined;
+    response = await axios.get(`${baseUrl}${url}`);
     return response;
   } catch (err) {
     if (!err?.response) {
       throw err;
     }
-    return thunkApi.rejectWithValue({ err: 'Error with getting categories' });
+    return thunkApi.rejectWithValue({ err: 'Error with getting pagination' });
   }
 })
 
@@ -34,11 +33,13 @@ const paginationSlice = createSlice({
         state.loading = true
       })
       .addCase(fetchPagination.fulfilled, (state, action) => {
-        state.pagination.totalPages = action.payload.data.totalPages;
-        state.pagination.currentPage = action.payload.data.currentPage;
+        state.totalPages = action.payload.data.totalPages;
+        state.currentPage = action.payload.data.currentPage;
+        state.loading = false;
       })
       .addCase(fetchPagination.rejected, (state, action) => {
         state.pagination = undefined;
+        state.loading = false;
         state.failed = true;
         state.error = action?.payload;
       })

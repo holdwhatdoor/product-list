@@ -1,62 +1,106 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { fetchProducts, fetchProduct } from '../reducers/productsSlice';
+import { fetchProducts } from '../reducers/productsSlice';
 import { fetchCategories, filterCategory } from '../reducers/categorySlice';
 import { fetchPagination } from '../reducers/paginationSlice';
-import React, { useEffect, useState } from 'react';
+import { fetchPriceSort } from '../reducers/priceSortSlice';
+import { fetchSearch } from '../reducers/searchSlice';
+import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { useSelector, useStore } from 'react-redux';
+import { buildQueryUrlFromValidParams } from '../actions';
 
 const SearchBar = () => {
   // store variable declaration and variable to track state of store
   const store = useStore();
-  const categoryData = useSelector((state) => state.categories);
-  const productData = useSelector((state) => state.products);
-  const paginationData = useSelector((state) => state.pagination);
+  const navigate = useNavigate();
 
-  // const [categories, getCategories] = useState();
-
-  useEffect(() => {
-    store.dispatch(fetchCategories());
-  }, []);
-
-  useEffect(() => {
-    store.dispatch(fetchPagination());
-  }, [])
-  useEffect(() => { 
-    store.dispatch(fetchProducts());
-  }, [])
-
-
-  // component category empty array to be populated with fetched data assigned to store state from db 
-  // const categories = data;
+  // selector state variables for react component
+  let currentPage = useSelector((state) => state.pagination.currentPage);
+  const categories = useSelector((state) => state.categories.categories);
+  const priceSortFilter = useSelector((state) => state.priceSort.priceSort);
+  const currentCategory = useSelector((state) => state.categories.selectedCategory);
+  const searchQuery = useSelector((state) => state.search.search);
 
   // user input component variables
-  const [ searchInput, setSearch ] = useState('')
-  const [ categorySelected, setCategory ] = useState('')
-  const [ priceSorted, setPriceSort ] = useState('');
+  const [ searchInput, setSearch ] = useState()
+  const [ inputCategorySelected, setCategory ] = useState()
+  const [ priceSorted, setPriceSort ] = useState();
 
-  const onSearchInputChange = () => {
-    store.dispatch()
+  useEffect(() => {
+    store.dispatch(fetchPagination(buildQueryUrlFromValidParams(currentPage, priceSortFilter, currentCategory, searchInput)))
+    store.dispatch(filterCategory(buildQueryUrlFromValidParams(currentPage, priceSortFilter, currentCategory, searchInput)))
+    store.dispatch(fetchProducts(buildQueryUrlFromValidParams(currentPage, priceSortFilter, currentCategory, searchInput)))
+    store.dispatch(fetchPriceSort(buildQueryUrlFromValidParams(currentPage, priceSortFilter, currentCategory, searchInput)))
+    store.dispatch(fetchSearch(buildQueryUrlFromValidParams(currentPage, priceSortFilter, currentCategory, searchInput)))
+  }, [ store, currentCategory ])
+
+  /**
+   * handles change to textfield for search input 
+   * 
+   * @param {*} searchInput 
+   */
+  const handleOnSearchInputChange = (searchText) => {
+    currentPage = 1;
+    setSearch(searchText)
+
+    let storeStateCurrentPriceSort = store.getState().priceSort.priceSort;
+    let storeStateCurrentSelectedCategory = store.getState().categories.selectedCategory;
+    
+    let pageToNavTo = buildQueryUrlFromValidParams(currentPage, storeStateCurrentPriceSort, storeStateCurrentSelectedCategory, searchText)
+    
+    store.dispatch(fetchSearch(buildQueryUrlFromValidParams(currentPage, storeStateCurrentPriceSort, storeStateCurrentSelectedCategory, searchText)))
+    store.dispatch(filterCategory(buildQueryUrlFromValidParams(currentPage, storeStateCurrentPriceSort, storeStateCurrentSelectedCategory, searchText)))
+    store.dispatch(fetchPriceSort(buildQueryUrlFromValidParams(currentPage, storeStateCurrentPriceSort, storeStateCurrentSelectedCategory, searchText)))
+    store.dispatch(fetchPagination(buildQueryUrlFromValidParams(currentPage, storeStateCurrentPriceSort, storeStateCurrentSelectedCategory, searchText)))
+    store.dispatch(fetchProducts(buildQueryUrlFromValidParams(currentPage, storeStateCurrentPriceSort, storeStateCurrentSelectedCategory, searchText)))
+    navigate(pageToNavTo)
   }
 
-  const onCategorySelect = () => {
-    store.dispatch()
+  /**
+   * 
+   * handles change to category value selected from dropdown - defaults to page 1 of products
+   * 
+   * @param {String} chosenCategory 
+   */
+  const handleOnCategorySelect = (chosenCategory) => {
+    currentPage = 1;
+    setCategory(chosenCategory);
+
+    let storeStateCurrentPriceSort = store.getState().priceSort.priceSort;
+    let storeStateCurrentSearchInput = store.getState().search.search;
+    
+    store.dispatch(fetchPagination(buildQueryUrlFromValidParams(currentPage, storeStateCurrentPriceSort, chosenCategory, storeStateCurrentSearchInput)))
+    store.dispatch(filterCategory(buildQueryUrlFromValidParams(currentPage, storeStateCurrentPriceSort, chosenCategory, storeStateCurrentSearchInput)))
+    store.dispatch(fetchPriceSort(buildQueryUrlFromValidParams(currentPage, storeStateCurrentPriceSort, chosenCategory, storeStateCurrentSearchInput)))
+    store.dispatch(fetchSearch(buildQueryUrlFromValidParams(currentPage, storeStateCurrentPriceSort, chosenCategory, storeStateCurrentSearchInput)))
+    store.dispatch(fetchProducts(buildQueryUrlFromValidParams(currentPage, storeStateCurrentPriceSort, chosenCategory, storeStateCurrentSearchInput)))
+
+    let pageToNavTo = buildQueryUrlFromValidParams(currentPage, storeStateCurrentPriceSort, chosenCategory, storeStateCurrentSearchInput)
+    navigate(pageToNavTo);
   }
 
-  const PopulateCategoryPicker = (categoriesArray) => {
-    const [ selectedCategory, setCategory] = useState('')
-    store.dispatch(fetchCategories());
+  /**
+   * 
+   * handles change to sorting price by value from drop-down menu
+   * 
+   * @param {String} priceSortSelected 
+   */
+  const handleOnPriceSortSelect = (priceSortSelected) => {
+    setPriceSort(priceSortSelected)
+    let newSearch = store.getState().search.search;
+    let newSelectedCategory = store.getState().categories.selectedCategory;
+    store.dispatch(fetchPriceSort(buildQueryUrlFromValidParams(currentPage, priceSortSelected, newSelectedCategory, newSearch)))
+    store.dispatch(filterCategory(buildQueryUrlFromValidParams(currentPage, priceSortSelected, newSelectedCategory, newSearch)))
+    store.dispatch(fetchSearch(buildQueryUrlFromValidParams(currentPage, priceSortSelected, newSelectedCategory, newSearch)))
+    store.dispatch(fetchProducts(buildQueryUrlFromValidParams(currentPage, priceSortSelected, newSelectedCategory, newSearch)))
+    store.dispatch(fetchPagination(buildQueryUrlFromValidParams(currentPage, priceSortSelected, newSelectedCategory, newSearch)))
+
+    let pageToNavTo = buildQueryUrlFromValidParams(currentPage, priceSortSelected, inputCategorySelected, searchInput);
+
+    navigate(pageToNavTo)
   }
 
-  const onPriceSortSelect = () => {
-    store.dispatch()
-  }
-  
-  // test returned data -- to be removed --
-  console.log("search-bar component store data *^*^*^*^*^*^*")
-  console.log(categoryData)
-  console.log(productData)
-  console.log(paginationData)
-
+  // returned JSX component Search bar
   return (
     <div style={{backgroundColor: 'lightgrey'}}>
       <div className="container" style={{}}>
@@ -68,7 +112,7 @@ const SearchBar = () => {
                 id="search-query"
                 className="form-control "
                 placeholder="Search"
-                onChange={(event) => setSearch(event.target.value)}
+                onChange={(event) => handleOnSearchInputChange(event.target.value)}
               />
             </div>
             <div className='col-md-2'>
@@ -76,14 +120,22 @@ const SearchBar = () => {
                 name="selectedCategory"
                 id="selectCategory"
                 className='form-control minimal'
-                onSelect={(event) => setCategory(event.target.value)}
-                placeholder={"Sort By Category"}
-                defaultValue= {"Sort By Category"}   
-                multiple={false}
-              >
-                <option style={{ fontWeight: 'bold' }}>Category:</option>
-                <option value=""></option>
-                <option value=""></option>
+                style={{ fontWeight: 'bold' }}
+                value={inputCategorySelected}
+                onChange={(event) => handleOnCategorySelect(event.target.value)}
+                multiple={false}>
+                  <option 
+                  value={ undefined }
+                    style={{ fontWeight: 'bold', backgroundColor: "lightgray" }}>
+                      Categories
+                  </option>
+                  {categories.map((category) => (
+                  <option 
+                    style={{ backgroundColor: "white" }} 
+                    value={category} key={category}>
+                      {category}
+                  </option>
+                ))}
               </select>
             </div>
             <div className='col-md-2'>
@@ -91,13 +143,25 @@ const SearchBar = () => {
                 name="sortPrice"
                 id="sortPrice"
                 className='form-control'
-                onSelect={(event) => setPriceSort(event.target.value)}
-                defaultValue={ "Sort By Price" }  
-                multiple={false}
-              >
-                <option >Sort Price</option>
-                <option value="Low to High">Low to High</option>
-                <option value="High to Low">High to Low</option>
+                style={{ fontWeight: 'bold' }}
+                onChange={(event) => handleOnPriceSortSelect(event.target.value)}
+                defaultValue="desc"   
+                multiple={false}>
+                <option 
+                  style={{ fontWeight: 'bold', backgroundColor: "lightgray"  }} 
+                  value="desc">
+                    Sort price
+                </option>
+                <option 
+                  style={{ backgroundColor: "white" }} 
+                  value="asc">
+                    Ascending
+                </option>
+                <option 
+                  style={{ backgroundColor: "white" }} 
+                  value="desc">
+                    Descending
+                </option>
               </select>
             </div>
           </form>
