@@ -4,7 +4,9 @@ import axios from 'axios';
 
 // initialState for products slice
 const initialState = {
-  products: [],
+  products: [], 
+  selectedProduct: {}
+  
 };
 
 const baseUrl = 'http://localhost:8000/products';
@@ -12,8 +14,7 @@ const baseUrl = 'http://localhost:8000/products';
 export const fetchProducts = createAsyncThunk('reducers/fetchProducts', 
   async (url, thunkApi) => {
     try{
-      let response = undefined;
-      response = await axios.get(`${baseUrl}${url}`);
+      let response = await axios.get(`${baseUrl}${url}`);
       return response
     } catch (err) {
       if (!err?.response) {
@@ -26,7 +27,7 @@ export const fetchProducts = createAsyncThunk('reducers/fetchProducts',
 export const fetchProduct = createAsyncThunk('reducers/fetchProduct',
   async (url, thunkApi) => {
   try {
-    let response = await axios.get(`${baseUrl}${url}`)
+    const response = await axios.get(`${baseUrl}/${url}`)
     return response;
   } catch (err) {
     if (!err?.response) {
@@ -39,7 +40,10 @@ export const fetchProduct = createAsyncThunk('reducers/fetchProduct',
 const productsSlice = createSlice({
   name: 'products',
   initialState,
-  reducers: {},
+  reducers: {
+    clearSelectedProduct: (state) => state.selectedProduct = {},
+    
+  },
   extraReducers: (builder) => {
     builder 
       .addCase(fetchProducts.pending, (state) => {
@@ -59,7 +63,7 @@ const productsSlice = createSlice({
         state.loading = true;
       })
       .addCase(fetchProduct.fulfilled, (state, action) => {
-        state.products = action.payload.data.products;
+        state.selectedProduct = action.payload.data[0];
         state.succeeded = true;
         state.error = undefined;
         state.loading = false;

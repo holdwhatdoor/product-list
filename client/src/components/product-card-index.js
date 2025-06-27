@@ -1,12 +1,30 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useStore } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { fetchProduct } from '../reducers/productsSlice';
+import { useEffect, useState } from 'react';
 
 const ProductCardIndex = (props) => {
+  const navigate = useNavigate();
+  const store = useStore();
+
+  useEffect(() => {
+    
+  }, [ ])  
+
+  const handleOnClickProduct = async () => {
+    await store.dispatch(fetchProduct(props.data._id))
+    navigate(`/products/${props.data._id}`)
+  }
 
   return (
     <div className="card-container" 
         style={{ width: '95%', 
         height: '90%', 
-        padding: '5%' }}>
+        padding: '5%' }}
+        id={props.data._id}
+        onClick={() => handleOnClickProduct()}
+        >
       <div className='header' 
         style={{ 
         width: "100%", 

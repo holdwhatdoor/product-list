@@ -27,6 +27,7 @@ const perPage = 9;
 // global empty variables to be populated
 const products = [];
 const productCategories = [];
+const selectedProduct = {};
 
 /** General functions */
 // capitalizes first letter of string 
@@ -51,13 +52,13 @@ function getTotalPages(products){
 }
 
 // clears global variable array 'products' of all items
-function clearProducts() {
-  products.splice(0, products.length);
+function clearProducts(productsArray) {
+  productsArray.splice(0, productsArray.length);
 }
 
 /** async functions that query the database */ 
 // populates global products array with data returned from database
-async function populateProductsReturned(category, sortedPrice, searchQuery){
+async function populateProductsReturned(productsArray, category, sortedPrice, searchQuery){
   switch(true){
     case ((category != undefined) && (searchQuery === undefined)):
       await Product.find({})
@@ -65,8 +66,8 @@ async function populateProductsReturned(category, sortedPrice, searchQuery){
       .equals(upperCaseFirstLetter(category))
       .exec()
       .then((product) => {
-        clearProducts();
-        products.push(product);
+        clearProducts(productsArray);
+        productsArray.push(product);
       })
     break;
     case ((category === undefined) && (searchQuery === undefined) && (sortedPrice != undefined)):
@@ -74,8 +75,8 @@ async function populateProductsReturned(category, sortedPrice, searchQuery){
       .sort({ price: sortedPrice })
       .exec()
       .then((product) => {
-        clearProducts();
-        products.push(product);
+        clearProducts(productsArray);
+        productsArray.push(product);
       })
     break;
     case ((category != undefined) && (sortedPrice != undefined) && (searchQuery === undefined)):
@@ -85,8 +86,8 @@ async function populateProductsReturned(category, sortedPrice, searchQuery){
       .sort({ price: sortedPrice })
       .exec()
       .then((product) => {
-        clearProducts();
-        products.push(product);
+        clearProducts(productsArray);
+        productsArray.push(product);
       })
     break;
     case ((category === undefined) && (searchQuery != undefined)):
@@ -96,8 +97,8 @@ async function populateProductsReturned(category, sortedPrice, searchQuery){
       .regex(searchQueryRegEx)
       .exec()
       .then((product) => {
-        clearProducts();
-        products.push(product)
+        clearProducts(productsArray);
+        productsArray.push(product)
       })
       break;
       case ((category != undefined) && (searchQuery != undefined)):
@@ -110,32 +111,32 @@ async function populateProductsReturned(category, sortedPrice, searchQuery){
         .sort({ price: sortedPrice })
         .exec()
         .then((product) => {
-          clearProducts();
-          products.push(product);
+          clearProducts(productsArray);
+          productsArray.push(product);
         })
         break;
     default:
       await Product.find({})
       .exec()
       .then((product) => {
-        clearProducts();
-        products.push(product);
+        clearProducts(productsArray);
+        productsArray.push(product);
       })
     break;
   }
 }
 
 // populates global categories array variable with all the different categories from database
-async function populateProductCategories(){ 
+async function populateProductCategories(categories){ 
   await Product.find({}).exec().then((products) => {
     products.forEach((product) => {
-      if(!productCategories.includes(product.category)){
-        productCategories.push(product.category);
+      if(!categories.includes(product.category)){
+        categories.push(product.category);
       }
     })
   })
-  productCategories.sort();
-  return productCategories;
+  categories.sort();
+  return categories;
 }
 
 // gets product id from product name
@@ -167,8 +168,8 @@ router.param("review", function(req, res, next){
 router.get('/products', async (req, res, next) => {
   try{
     // populate products and productCategories arrays with database data
-    await populateProductsReturned(req.query.category, req.query.price, req.query.query);
-    await populateProductCategories();
+    await populateProductsReturned(products, req.query.category, req.query.price, req.query.query);
+    await populateProductCategories(productCategories);
 
     // req.query result variables
     const currentPage = Number(req.query.page) || 1;
@@ -272,45 +273,84 @@ router.get('/products', async (req, res, next) => {
 
   }
 })
+
 // get route for specific product in products
-router.get("/products/:product", (req, res, next) => {
-  let productId = req.params.product.substring(1, req.params.product.length);
-  Product.find({ _id: productId  }).exec().then((product) => {
-    res.send(product);
-  })
+router.get("/products/:product", async (req, res, next) => {
+  try {
+    let productId = req.params.product.substring(0, req.params.product.length);
+    await Product
+      .find({ _id: productId  })
+      .populate("reviews")
+      .exec()
+      .then((product) => {
+        res.send(product);
+      })
+
+  } catch (error) {
+  }
 })
-// get route for reviews of product param
-router.get("/products/:product/reviews", (req, res, next) => {
-  let productId = req.params.product.substring(1, req.params.product.length);
-  Product.find({_id: productId}).exec().then((product) => {
-    res.send(product.reviews);
-  })
-})
+
 // post route for creating a new product to products page
-router.post("/products", (req, res, next) => {
-  let product = req.body.newProduct;
-  if(!product.category || !product.name || !product.price || !product.image){
+router.post("/products", async (req, res, next) => {
+  try {
+    let product = req.body.newProduct;
+    if(!product.category || !product.name || !product.price || !product.image){
     res.writeHead(400, "Invalid product input");
     return res.end();
   }
-  res.post(req.body.newProduct)
+  res.post(req.body.newProduct)   
+  } catch (error) {
+    
+  }
 })
 // post route for creating a new review in the database for the correct product's reviews array 
-router.post("/products/:product/reviews", (req, res, next) => {
-  let productReviews = Review.find({_id: req.params.product})
+router.post("/products/:product", async (req, res, next) => {
+  try {
+    const review = new Review({
+      userName: "Anon",
+      text: req.body.text,
+      productId: req.params.product
+    })
 
-  res.post(req.body.newReview)
+    const product = await Product.find({_id: req.params.product}).exec()
+    if(!product){
+      return res.status(404).send({error: "Product not Found"})
+    } else {
+      review.save();
+      await Product.updateOne({_id: req.params.product}, { $push: { reviews: review._id}})
+      return res.status(201).send(review)
+    }
+  } catch (error) {
+    res.status(400).send("error")
+  }
 })
 // deletes product by param product's id
-router.delete("/products/:product", (req, res, next) => {
-  let productId = productIdFromNameQuery(req.params.product.name)
-  Product.findByIdAndDelete(productId)
-  res.delete(req.params.product)
+router.delete("/products/:product", async (req, res, next) => {
+  try {
+  } catch (error) {
+  }
+
+
 })
 // deletes review by param review's id
-router.delete("/reviews/:review", (res, req, next) => {
-  Review.findByIdAndDelete(req.params.review)
-  res.delete(req.params.review)
+router.delete("/products/:product/reviews/:review", async (req, res, next) => {
+  try{
+    await Product.updateOne(
+      {_id: req.params.product}, 
+      { $pull: {reviews: req.params.review} })
+      .exec()
+    await Review.findByIdAndDelete(req.params.review).exec()
+    return res.send(`Review with id: ${req.params.review} has been deleted.`)
+  } catch(err) {
+  }
+})
+// update product by param product id
+router.put("products/:product", async (res, req, next) => {
+
+})
+// update product review by param review id
+router.put("products/:product/reviews/:review", async (res, req, next) => {
+  
 })
 
 module.exports = router;

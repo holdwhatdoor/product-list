@@ -27,17 +27,17 @@ const SearchBar = () => {
   const [ priceSorted, setPriceSort ] = useState();
 
   useEffect(() => {
-    store.dispatch(fetchPagination(buildQueryUrlFromValidParams(currentPage, priceSortFilter, currentCategory, searchInput)))
-    store.dispatch(filterCategory(buildQueryUrlFromValidParams(currentPage, priceSortFilter, currentCategory, searchInput)))
-    store.dispatch(fetchProducts(buildQueryUrlFromValidParams(currentPage, priceSortFilter, currentCategory, searchInput)))
-    store.dispatch(fetchPriceSort(buildQueryUrlFromValidParams(currentPage, priceSortFilter, currentCategory, searchInput)))
-    store.dispatch(fetchSearch(buildQueryUrlFromValidParams(currentPage, priceSortFilter, currentCategory, searchInput)))
+    store.dispatch(fetchPagination(buildQueryUrlFromValidParams(currentPage, priceSortFilter, currentCategory, searchQuery)))
+    store.dispatch(filterCategory(buildQueryUrlFromValidParams(currentPage, priceSortFilter, currentCategory, searchQuery)))
+    store.dispatch(fetchProducts(buildQueryUrlFromValidParams(currentPage, priceSortFilter, currentCategory, searchQuery)))
+    store.dispatch(fetchPriceSort(buildQueryUrlFromValidParams(currentPage, priceSortFilter, currentCategory, searchQuery)))
+    store.dispatch(fetchSearch(buildQueryUrlFromValidParams(currentPage, priceSortFilter, currentCategory, searchQuery)))
   }, [ store, currentCategory ])
 
   /**
    * handles change to textfield for search input 
    * 
-   * @param {*} searchInput 
+   * @param {*} searchText
    */
   const handleOnSearchInputChange = (searchText) => {
     currentPage = 1;

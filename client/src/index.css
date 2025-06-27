@@ -11,3 +11,50 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+
+div.reviews-nav-click {
+
+}
+
+div.reviews-nav-click:hover {
+  font-weight: bold;
+  color: blue;
+  cursor: pointer;
+}
+
+label.show-hide-reviews-label-toggle:hover {
+  font-weight: bold;
+  color: blue;
+  cursor: pointer;
+}
+
+div.review-input {
+  
+}
+
+div.reviews-nav-section {
+}
+
+div.editing-container {
+}
+
+ul.product-reviews-list {
+  list-style-type: none;
+}
+
+
+li.product-review-list-item {
+  border-radius: 2%;
+  border-color: black;
+  border-style: solid;
+  border-width: 3px;
+}
+
+label.product-review-id-label {
+  background-color: darkgray;
+}
+
+label.product-review-user-label {
+  background-color: lightblue;
+}

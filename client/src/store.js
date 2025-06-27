@@ -5,6 +5,7 @@ import categorySlice from './reducers/categorySlice';
 import paginationSlice from './reducers/paginationSlice';
 import priceSortSlice from './reducers/priceSortSlice';
 import searchSlice from './reducers/searchSlice';
+import thunk from 'redux-thunk';
 
 const reducers = combineReducers({
   products: productsSlice,
@@ -18,7 +19,7 @@ const reducers = combineReducers({
 export const store = configureStore({
   reducer: reducers,
   initialState: [
-    { categories: { categories: [], selectedCategory: ""}, pagination: { totalPages: 0, currentPage: 0 }, priceSort: { priceSort: "desc" }, products: { products: [], selectedProduct: "", productData: { _id: "", reviews: [], 
+    { categories: { categories: [], selectedCategory: ""}, pagination: { totalPages: 0, currentPage: 0 }, priceSort: { priceSort: "desc" }, products: { products: [], selectedProduct: {}, productData: { _id: "", reviews: [], 
     name: "", price: 0, image: "" }  }, search: { search: "" } 
     }
   ],

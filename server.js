@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
+// const cors = require("cors")
 
 
 mongoose.connect("mongodb://localhost/products", {
@@ -22,7 +23,7 @@ app.use((req, res, next) => {
   res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE");
   res.header(
     "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
+    "Origin, X-Requested-With, Authorization, Content-Type, Accept"
   );
   next();
 });
