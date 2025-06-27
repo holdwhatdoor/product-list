@@ -8,11 +8,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { store } from './store';
 import './index.css';
 import ProductsIndex from './components/products-index';
-// import ProductCardIndex from './components/product-card-index';
 import ProductDetail from './components/product-detail';
-import ProductReviews from './components/product-reviews';
-import AddReview from './components/add-review'
-import Review from './components/review'
 import reportWebVitals from './reportWebVitals';
 import HomeNavButton from './components/home-nav-button';
 
@@ -25,7 +21,6 @@ root.render(
         <Route path="/products" Component={ ProductsIndex }/>
         <Route path="/products/:product" Component={ ProductDetail }/>
         <Route path="/products/:product/reviews" Component={ ProductDetail }/>
-        {/* <Route path="/products/:product/add-review" Component={ AddReview }/> */}
         <Route path="/products/:product/reviews/:review" Component={ ProductDetail }/>
       </Routes>
     </BrowserRouter>
