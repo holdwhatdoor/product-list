@@ -7,21 +7,27 @@ import { Provider } from 'react-redux';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { store } from './store';
 import './index.css';
+import UserPage from './components/user-page'
 import ProductsIndex from './components/products-index';
 import ProductDetail from './components/product-detail';
 import reportWebVitals from './reportWebVitals';
-import HomeNavButton from './components/home-nav-button';
+import Home from './components/home';
+import Login from './components/login';
+import Signup from './components/signup';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <Provider store={store}>
     <BrowserRouter>
       <Routes>
-        <Route path="/" Component={ HomeNavButton }/>
-        <Route path="/products" Component={ ProductsIndex }/>
-        <Route path="/products/:product" Component={ ProductDetail }/>
-        <Route path="/products/:product/reviews" Component={ ProductDetail }/>
-        <Route path="/products/:product/reviews/:review" Component={ ProductDetail }/>
+        <Route path="/" Component={ Home }/>
+        <Route path='/signup' Component={ Signup } />
+        <Route path='/auth/login' Component={ Login } />
+        <Route path='/auth/:user' Component={ UserPage } />
+        <Route path="/auth/:user/products" Component={ ProductsIndex }/>
+        <Route path="/auth/:user/products/:product" Component={ ProductDetail }/>
+        <Route path="/auth/:user/products/:product/reviews" Component={ ProductDetail }/>
+        <Route path="/auth/:user/products/:product/reviews/:review" Component={ ProductDetail }/>
       </Routes>
     </BrowserRouter>
   </Provider>

@@ -13,6 +13,7 @@ import NavPageFooter from './nav-page-footer';
 import { useNavigate, useParams } from 'react-router-dom';
 import { buildQueryUrlFromValidParams } from '../actions';
 import { fetchSearch } from '../reducers/searchSlice';
+import { clearSelectedProduct } from '../reducers/productsSlice';
 
 const ProductsIndex = () => {
   
@@ -20,28 +21,24 @@ const ProductsIndex = () => {
   const navigate = useNavigate();
 
   // selector state slice variables
+  const user = useSelector((state) => state.user.user)
   const productsArray = useSelector((state) => state.products.products) 
-
-  // let currentPage = useSelector((state) => state.pagination.currentPage);
-  // const priceSortFilter = useSelector((state) => state.priceSort.priceSort);
-  // const currentCategory = useSelector((state) => state.selectedCategory);
-  // const searchQuery = useSelector((state) => state.search.search);
+  const selectedProduct = useSelector((state) => state.products.selectedProduct)
 
   const currentPage = store.getState().pagination.currentPage;
   const priceSortFilter = store.getState().priceSort.priceSort;
   const currentCategory = store.getState().categories.selectedCategory;
   const searchQuery = store.getState().search.search;
-  
-  // const totalStore = store.getState();
 
   // initial dispatch calls to load page-state data
   useEffect(() => {
-    store.dispatch(fetchCategories(buildQueryUrlFromValidParams(currentPage, priceSortFilter, currentCategory, searchQuery)));
-    store.dispatch(filterCategory(buildQueryUrlFromValidParams(currentPage, priceSortFilter, currentCategory, searchQuery)));
-    store.dispatch(fetchPagination(buildQueryUrlFromValidParams(currentPage, priceSortFilter, currentCategory, searchQuery)));
-    store.dispatch(fetchProducts(buildQueryUrlFromValidParams(currentPage, priceSortFilter, currentCategory, searchQuery)));
-    store.dispatch(fetchPriceSort(buildQueryUrlFromValidParams(currentPage, priceSortFilter, currentCategory, searchQuery)));
-    store.dispatch(fetchSearch(buildQueryUrlFromValidParams(currentPage, priceSortFilter, currentCategory, searchQuery)))
+    store.dispatch(clearSelectedProduct());
+    store.dispatch(fetchCategories(buildQueryUrlFromValidParams(user, currentPage, priceSortFilter, currentCategory, searchQuery)));
+    store.dispatch(filterCategory(buildQueryUrlFromValidParams(user, currentPage, priceSortFilter, currentCategory, searchQuery)));
+    store.dispatch(fetchPagination(buildQueryUrlFromValidParams(user, currentPage, priceSortFilter, currentCategory, searchQuery)));
+    store.dispatch(fetchProducts(buildQueryUrlFromValidParams(user, currentPage, priceSortFilter, currentCategory, searchQuery)));
+    store.dispatch(fetchPriceSort(buildQueryUrlFromValidParams(user, currentPage, priceSortFilter, currentCategory, searchQuery)));
+    store.dispatch(fetchSearch(buildQueryUrlFromValidParams(user, currentPage, priceSortFilter, currentCategory, searchQuery)))
   }, [ store, currentPage, currentCategory ]);
 
   /**
@@ -82,9 +79,9 @@ const ProductsIndex = () => {
   return (
       <div className="product-page-container" style={{ backgroundColor: 'lightgrey', position: 'absolute', height: "100%", width: "100%"}}>
         <Header />
+        <div id='user-product-page-username'></div>
         <SearchBar />
-        <div>
-        </div>
+        <div/>
         <div className="product-page grid row" style={{ backgroundColor: "lightgray"}} >
           <div className='row-md-4'>
             { productGrid(gridRowsArray(productsArray)) }

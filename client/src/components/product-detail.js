@@ -1,23 +1,24 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect, useState, useRef } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector, useStore } from 'react-redux';
 import axios from 'axios';
 import { fetchProduct } from '../reducers/productsSlice';
+import { clearSelectedProduct } from '../reducers/productsSlice';
 
 const ProductDetail = () => {
   const productID = useParams().product;
+  const user = useSelector((state) => state.user)
   const store = useStore();
   const product = useSelector((state) => state.products.selectedProduct);
   const navigate = useNavigate();
   
   const [ reviewsVisible, setReviewsVisible ] = useState(false)
   const [ editingIndex, setEditingIndex ] = useState(null);
-   
 
   useEffect(() => {
     store.dispatch(fetchProduct(productID))
-  }, [ store, productID, product ])
+  }, [ store, productID,  ])
 
   // variable for product reviews
    const listOfProductReviews = (productReviewsArray) => {
@@ -39,13 +40,12 @@ const ProductDetail = () => {
                     id='editing-review-textarea'
                     type='text'
                     defaultValue={cell.text}
-                    autoFocus={true}
-                    // onChange={}
+                    autoFocus={true} 
                   />
                   <div class='editing-review-btns-container'>
                     <button 
                       class='editing-review-save-btn'
-                      onClick={handleSaveReviewEditClick(index, cell)}>
+                      onClick={() => handleSaveReviewEditClick(index, cell)}>
                         Save
                       </button>
                     <button 
@@ -82,38 +82,98 @@ const ProductDetail = () => {
     switch(true){
       case reviewsVisible && editingIndex === null:
         setReviewsVisible(false)
-        navigate('/products')
+        navigate(`/auth/${user}products`)
         break;
       case !reviewsVisible:
-        navigate('/products')
+        navigate(`/auth/${user}/products`)
         break;
       case reviewsVisible && editingIndex != null:
         setEditingIndex(null)
         setReviewsVisible(false)
-        navigate('/products')
+        navigate(`/auth/${user}/products`)
         break;
       default: 
-        navigate('/products')
+        navigate(`/auth/${user}/products`)
         break;
     }
   }
 
-  const handleOnSaveProductButtonClick = () => {
+  const handleOnSaveProductButtonClick = async () => {
+    const updatedProductName = document.getElementById('product-detail-name-input').value;
+    const updatedProductCategory = document.getElementById('product-detail-category-input').value;
+    const updatedProductPrice = document.getElementById('product-detail-price').value;
+    
+    if(!productNameInputValid(updatedProductName) || !productCategoryInputValid(updatedProductCategory) || !productPriceInputValid(updatedProductPrice)) {
+      alert("One or more required fields are not filled out.  Please fill all fields before submitting updated product info.")
+    } else {
+      const updatedProductInfo = { 
+        name: updatedProductName, 
+        category: updatedProductCategory, 
+        price: updatedProductPrice 
+      }
+      try{
+        await axios.put(`http://localhost:8000/products/${productID}`, 
+          {updatedProductInfo: updatedProductInfo})
+        // navigate(`/products/${product._id}`)
 
+      } catch(err) {
+        alert(err)
+      }
+
+    }
+  }
+
+  const productNameInputValid = (inputName) => {
+    if(inputName === null || inputName === '' || inputName === undefined){
+      return false
+    } else {
+      return true
+    }
+  }
+
+    const productCategoryInputValid = (inputCategory) => {
+    if(inputCategory === null || inputCategory === '' || inputCategory === undefined){
+      return false
+    } else {
+      return true
+    }
+  }
+
+    const productPriceInputValid = (inputPrice) => {
+    if(/^\d+$/.test(inputPrice)){
+      return true
+    } else {
+      return false
+    }
+  }
+
+  const reviewTextAreaIsBlank = () => {
+    if(document.getElementById("input-review-textarea").value === "" || null || undefined){
+      return true
+    } else {
+      return false
+    }
   }
 
   const handleAddReviewBtnClick = async () => {
-    const newReview = { userName: "anon", text: document.getElementById("input-review-textarea").value, productId: productID }
-
-    try{
-      await axios.post(`http://localhost:8000/products/${productID}`, newReview )
-    } catch(err) {
-    }
-
-    document.getElementById("input-review-textarea").value = "";
-    setReviewsVisible(true)
-    if(!reviewsVisible){
-      navigate('reviews')
+    if(!reviewTextAreaIsBlank()) {
+      const newReview = { 
+        userName: "anon", 
+        text: document.getElementById("input-review-textarea").value, 
+        productId: productID 
+      }
+      try{
+        await axios.post(`http://localhost:8000/products/${productID}`, newReview )
+      } catch(err) {
+        alert(err)
+      }
+      document.getElementById("input-review-textarea").value = "";
+      setReviewsVisible(true)
+      if(!reviewsVisible){
+        navigate('reviews')
+      }
+    } else {
+      alert("Please enter a review before clicking the 'Add Review Button' ");
     }
   }
 
@@ -140,8 +200,18 @@ const ProductDetail = () => {
 
   }
 
-  const handleSaveReviewEditClick = (index, review) => {
-
+  const handleSaveReviewEditClick = async (index, review) => {
+    if(document.getElementById('editing-review-textarea').value === '' || null || undefined ){
+      alert("Please enter text in the review text field before saving your edited review")
+    } else {
+      const updatedReviewText = document.getElementById('editing-review-textarea').value;
+      try{
+        await axios.put(`http://localhost:8000/products/${productID}/reviews/${review._id}`, 
+          {text: updatedReviewText}).then(setEditingIndex(null))
+      } catch(err) {
+        alert(err)
+      }
+    }
   }
 
   const handleCancelReviewEditClick = () => {
@@ -174,14 +244,14 @@ const ProductDetail = () => {
       <div className="product-detail-name-row row" >
         <label className="col" style={{width: "200px"}} >Product Name: </label>
         <input 
-          className="product-detail-name-input col"
+          id="product-detail-name-input"
           defaultValue={product.name} 
           style={{width: "300px"}} />
       </div>
       <div className="product-detail-category-row row" >
         <label class="col" style={{width: "200px"}} >Product Category: </label>
         <input 
-          className="product-detail-category-input row"
+          id="product-detail-category-input"
           defaultValue={product.category}
           style={{width: "150px"}} />
       </div>
@@ -199,7 +269,7 @@ const ProductDetail = () => {
       <div className="product-detail-price-row row" >
         <label className="col" style={{width: "200px"}} >Price: </label>
         <input 
-          className="product-detail-price row"
+          id="product-detail-price"
           defaultValue={product.price}
           style={{justifyItems: "center", width: "200px"}} />
       </div>
@@ -217,7 +287,9 @@ const ProductDetail = () => {
       </div>
       <div className='review-input row'>
         <textarea id="input-review-textarea" />
-        <button class="add-review-btn" onClick={handleAddReviewBtnClick} >Add Review</button>
+        <button class="add-review-btn" onClick={handleAddReviewBtnClick} >
+          Add Review
+        </button>
       </div>
       <div class="reviews-nav-section row">
         <div className='spacer col'></div>

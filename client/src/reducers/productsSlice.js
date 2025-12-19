@@ -9,7 +9,7 @@ const initialState = {
   
 };
 
-const baseUrl = 'http://localhost:8000/products';
+const baseUrl = 'http://localhost:8000/auth/';
 
 export const fetchProducts = createAsyncThunk('reducers/fetchProducts', 
   async (url, thunkApi) => {
@@ -27,13 +27,13 @@ export const fetchProducts = createAsyncThunk('reducers/fetchProducts',
 export const fetchProduct = createAsyncThunk('reducers/fetchProduct',
   async (url, thunkApi) => {
   try {
-    const response = await axios.get(`${baseUrl}/${url}`)
-    return response;
+    let response = await axios.get(`${baseUrl}/${url}`)
+    return response
   } catch (err) {
     if (!err?.response) {
       throw err;
     }
-    return thunkApi.rejectWithValue({ err: 'Error with query' });
+    return thunkApi.rejectWithValue({ err: 'Error with getting product' });
   }
 })
 
@@ -41,7 +41,7 @@ const productsSlice = createSlice({
   name: 'products',
   initialState,
   reducers: {
-    clearSelectedProduct: (state) => state.selectedProduct = {},
+    clearSelectedProduct: (state) => { state.selectedProduct = initialState.selectedProduct },
     
   },
   extraReducers: (builder) => {
@@ -77,4 +77,5 @@ const productsSlice = createSlice({
   }
 });
 
+export const { clearSelectedProduct } = productsSlice.actions;
 export default productsSlice.reducer;

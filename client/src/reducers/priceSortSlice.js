@@ -7,7 +7,7 @@ const initialState = {
   priceSort: "desc"
 };
 
-const baseUrl = 'http://localhost:8000/products';
+const baseUrl = 'http://localhost:8000/auth/';
 
 export const fetchPriceSort = createAsyncThunk('reducers/fetchPriceSort', async (url, thunkApi) => {
   try{

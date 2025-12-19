@@ -1,5 +1,6 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 // eslint-disable-next-line import/no-extraneous-dependencies
+import authSlice from './reducers/authSlice'
 import productsSlice from './reducers/productsSlice';
 import categorySlice from './reducers/categorySlice';
 import paginationSlice from './reducers/paginationSlice';
@@ -8,6 +9,7 @@ import searchSlice from './reducers/searchSlice';
 import thunk from 'redux-thunk';
 
 const reducers = combineReducers({
+  auth: authSlice,
   products: productsSlice,
   categories: categorySlice, 
   pagination: paginationSlice,

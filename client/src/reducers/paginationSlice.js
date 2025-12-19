@@ -8,7 +8,7 @@ const initialState = {
   currentPage: 1,
 };
 
-const baseUrl = 'http://localhost:8000/products';
+const baseUrl = 'http://localhost:8000/auth/';
 
 export const fetchPagination = createAsyncThunk('reducers/fetchPagination', async (url, thunkApi) => {
   try{

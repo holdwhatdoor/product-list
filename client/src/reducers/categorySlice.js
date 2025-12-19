@@ -9,7 +9,7 @@ const initialState = {
 };
 
 // api base Products url 
-const baseUrl = 'http://localhost:8000/products';
+const baseUrl = 'http://localhost:8000/auth/';
 
 export const fetchCategories = createAsyncThunk('reducers/fetchCategories', async (url, thunkApi) => {
   try{

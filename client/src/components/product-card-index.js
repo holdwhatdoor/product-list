@@ -1,5 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useStore } from 'react-redux';
+import { useStore, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { fetchProduct } from '../reducers/productsSlice';
 import { useEffect, useState } from 'react';
@@ -7,14 +7,15 @@ import { useEffect, useState } from 'react';
 const ProductCardIndex = (props) => {
   const navigate = useNavigate();
   const store = useStore();
+  const user = useSelector((state) => state.user)
 
   useEffect(() => {
     
   }, [ ])  
 
   const handleOnClickProduct = async () => {
-    await store.dispatch(fetchProduct(props.data._id))
-    navigate(`/products/${props.data._id}`)
+    store.dispatch(fetchProduct(props.data._id))
+    navigate(`/auth/${user}/products/${props.data._id}`)
   }
 
   return (

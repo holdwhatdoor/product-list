@@ -12,6 +12,26 @@ code {
     monospace;
 }
 
+div#header{
+  background-color: lightgrey;
+  height: 50px;
+  width: 100%;
+  text-align: end;
+}
+div#header-btn-container{
+  background-color: lightgrey;
+  position: relative;
+  text-align: end;
+}
+button#products-page-logout-btn{
+  /* position:fixed; */
+}
+
+/* div#logout-alert-window{
+  display: block;
+  left: 50%;
+  top: 50%;
+} */
 
 div.reviews-nav-click {
 

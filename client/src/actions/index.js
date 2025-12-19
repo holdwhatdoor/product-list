@@ -1,18 +1,5 @@
 import axios from "axios";
-
-// action type strings -- for future functionality - not currently used
-export const FETCH_PRODUCTS = "FETCH_PRODUCTS";
-export const FETCH_PRODUCT = "FETCH_PRODUCT";
-export const DELETE_PRODUCT = "DELETE_PRODUCT";
-export const CREATE_PRODUCT = "CREATE_PRODUCT";
-
-export const FETCH_REVIEWS = "FETCH_PRODUCTS";
-export const FETCH_REVIEW = "FETCH_PRODUCT";
-export const DELETE_REVIEW = "DELETE_PRODUCT";
-export const CREATE_REVIEW = "CREATE_PRODUCT";
-
-export const FETCH_CATEGORIES = "FETCH_CATEGORIES";
-export const FETCH_SORT = "FETCH_SORT";
+import { FETCH_PRODUCTS, FETCH_PRODUCT, FETCH_CATEGORIES, FETCH_REVIEWS, FETCH_REVIEW, CREATE_PRODUCT, DELETE_PRODUCT, CREATE_REVIEW, DELETE_REVIEW} from './types';
 
 const ROOT_URL = "http://localhost:8000";
 
@@ -24,13 +11,12 @@ const ROOT_URL = "http://localhost:8000";
  * @param {String} search 
  * @returns 
  */
-export const buildQueryUrlFromValidParams = (currentPage, priceSortFilter, selectedCategory, search) => {
-  let validQueryParamsURL = `?page=${currentPage}`;
+export const buildQueryUrlFromValidParams = (user, currentPage, priceSortFilter, selectedCategory, search) => {
+  let validQueryParamsURL = `${user}/products?page=${currentPage}`;
   if(checkOptionalParamValid(priceSortFilter)){
     validQueryParamsURL = validQueryParamsURL.concat(`&price=${priceSortFilter}`);
   }
   if(checkOptionalParamValid(selectedCategory) && selectedCategory === "Categories"){
-    // validQueryParamsURL = validQueryParamsURL.concat(`&category=${selectedCategory}`);
     
   }
   if(checkOptionalParamValid(selectedCategory) && selectedCategory !== "Categories" ){
@@ -40,6 +26,33 @@ export const buildQueryUrlFromValidParams = (currentPage, priceSortFilter, selec
     validQueryParamsURL = validQueryParamsURL.concat(`&query=${search}`)
   }
   return validQueryParamsURL;
+}
+
+export const signup = (signupInput, callback) => {
+  axios.post(
+    'http://localhost:8000/signup', 
+    signupInput
+  ).then(function (response){
+    //dispatch action and local storage token assignment
+    localStorage.getItem('token', response.data.token)
+    // callback for page loading response after successful signup
+    callback()
+  })
+
+}
+
+export const login = (loginInput, callback) => {
+  try{
+    axios.post(
+    'http://localhost:8000/auth/login',
+    loginInput
+  ).then(function (response){
+    localStorage.setItem('token', response.data.token)
+    callback()
+  })
+  // needs error catch response 
+ } catch(err){
+ }
 }
 
   /**
@@ -55,6 +68,7 @@ function checkOptionalParamValid(param){
   return isValid;
 }
 
+//
 // action functions for string reference action types - for future use - not currently utilized
 export function fetchProducts(){
   const request = axios.get(`${ROOT_URL}/products?`);

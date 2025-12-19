@@ -1,8 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-// const cors = require("cors")
-
+const passport = require('passport')
+require('./services/passport')
 
 mongoose.connect("mongodb://localhost/products", {
   useNewUrlParser: true,
@@ -27,6 +27,8 @@ app.use((req, res, next) => {
   );
   next();
 });
+
+app.use(passport.initialize())
 
 const mainRoutes = require("./routes/main");
 

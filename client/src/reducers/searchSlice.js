@@ -6,7 +6,7 @@ import axios from 'axios';
 const initialState = {
   search: undefined
 }
-const baseUrl = 'http://localhost:8000/products';
+const baseUrl = 'http://localhost:8000/auth/';
 
 export const fetchSearch = createAsyncThunk('reducers/fetchSearch', async(url, thunkApi) => {
   try{

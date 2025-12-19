@@ -1,7 +1,12 @@
 const router = require("express").Router();
-const product = require("../models/product");
 const Product = require("../models/product");
 const Review = require("../models/review");
+const User = require('../models/user');
+const Authentication = require('../controllers/authentication')
+const passport = require('passport');
+
+const requireAuth = passport.authenticate('jwt', { session: false });
+const requireSignin = passport.authenticate('local', { session: false, failWithError: false });
 
 /**
  *  function to initially populate database with 90 random products 
@@ -23,11 +28,13 @@ const Review = require("../models/review");
 // });
 
 // global variables 
+// items to be loaded per page
 const perPage = 9;
-// global empty variables to be populated
+// global empty variables to be populated for authorized users
 const products = [];
 const productCategories = [];
 const selectedProduct = {};
+const user = {};
 
 /** General functions */
 // capitalizes first letter of string 
@@ -155,6 +162,10 @@ async function productIdFromNameQuery(productNameQuery){
 }
 
 // router params
+router.param("user", function (req, res, next){
+  req.user;
+  next()
+})
 router.param("product", function(req, res, next){
   req.product;
   next();
@@ -163,6 +174,44 @@ router.param("review", function(req, res, next){
   req.review;
   next();
 })
+
+// get route for user login
+// router.get('/login', async (req, res, next) => {
+//   try{
+//     const existingUser = await checkUserExists(req.query.username)
+//     if(existingUser){
+//       await authenticateUserLogin(req.query.username, req.query.password)
+//     }else{
+//       alert(`User with username: ${req.query.username} does not exist`)
+//     }
+
+//   }
+//   catch{
+
+//   }
+// })
+
+router.post('/signup', Authentication.signup)
+
+// need to figure out issue with middleware not executing properly
+router.post('/auth/login', requireSignin, Authentication.login )
+
+// using callback function and not multiple middleware like above route
+// router.post('/auth/login', (req, res, next) => {
+//   passport.authenticate('local', (err, user, info) => {
+//     if (err) return next(err);
+//     if (!user) return res.status(401).json({ error: info.message || 'Login failed' });
+//     // Skip req.logIn since you're using JWTs
+//     return res.json({ token: Authentication.tokenForUser(user) });
+//   })(req, res, next);
+// });
+
+router.get('/auth/:user', requireAuth, Authentication.currentUser)
+router.get('/auth/:user/cart', requireAuth, Authentication.currentUser)
+router.get('/auth/:user/products', requireAuth, Authentication.currentUser)
+router.get('/auth/:user/products/:product', requireAuth, Authentication.currentUser)
+router.post('/auth/:user/products/:product/reviews/:review')
+
 
 // get route for all Products
 router.get('/products', async (req, res, next) => {
@@ -307,7 +356,7 @@ router.post("/products", async (req, res, next) => {
 router.post("/products/:product", async (req, res, next) => {
   try {
     const review = new Review({
-      userName: "Anon",
+      userName: req.body.userName,
       text: req.body.text,
       productId: req.params.product
     })
@@ -318,18 +367,42 @@ router.post("/products/:product", async (req, res, next) => {
     } else {
       review.save();
       await Product.updateOne({_id: req.params.product}, { $push: { reviews: review._id}})
-      return res.status(201).send(review)
+      return res.status(201).send(review).end()
     }
   } catch (error) {
     res.status(400).send("error")
   }
 })
+
+// update product by param product id
+router.put("/products/:product", async (req, res, next) => {
+  try{
+    return res.status(200).send()
+  } catch {
+
+  }
+})
+// update product review by param review id
+router.put("/products/:product/reviews/:review", async (req, res, next) => {
+  try {
+    await Review.findByIdAndUpdate(req.params.review, 
+      {$set: { text: req.body.text }},
+      {new: true}
+    ).exec()
+    await Product.findById(product).populate('reviews').exec()
+    
+  
+    return res.status(200).send(`Review id: ${req.params.review} updated`)
+  } catch {
+
+  }
+})
+
 // deletes product by param product's id
 router.delete("/products/:product", async (req, res, next) => {
   try {
-  } catch (error) {
+  } catch (err) {
   }
-
 
 })
 // deletes review by param review's id
@@ -342,15 +415,8 @@ router.delete("/products/:product/reviews/:review", async (req, res, next) => {
     await Review.findByIdAndDelete(req.params.review).exec()
     return res.send(`Review with id: ${req.params.review} has been deleted.`)
   } catch(err) {
-  }
-})
-// update product by param product id
-router.put("products/:product", async (res, req, next) => {
 
-})
-// update product review by param review id
-router.put("products/:product/reviews/:review", async (res, req, next) => {
-  
+  }
 })
 
 module.exports = router;
